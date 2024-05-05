@@ -96,7 +96,6 @@ void update(float deltaTime)
         ballVelocityY *= -1;
     }
     
-
     if (ball.x < 0 || ball.x > SCREEN_WIDTH - 32)
     {
         ballVelocityX *= -1;
