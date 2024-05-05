@@ -83,11 +83,19 @@ void update(float deltaTime)
         player.x += playerSpeed * deltaTime;
     }
 
-    if (ball.y > SCREEN_HEIGHT + 32 || ball.y < -32)
+    if (ball.y > SCREEN_HEIGHT + 32)
     {
         ball.x = SCREEN_WIDTH / 2 - 32;
         ball.y = SCREEN_HEIGHT / 2 - 32;
+
+        ballVelocityX *= -1;
     }
+
+    if (ball.y < 0)
+    {
+        ballVelocityY *= -1;
+    }
+    
 
     if (ball.x < 0 || ball.x > SCREEN_WIDTH - 32)
     {
