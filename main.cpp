@@ -8,8 +8,8 @@ SDL_Rect player;
 SDL_Rect ball;
 
 int playerSpeed = 800;
-int ballVelocityX = 400;
-int ballVelocityY = 400;
+int ballVelocityX = 425;
+int ballVelocityY = 425;
 
 const int SCREEN_WIDTH = 960;
 const int SCREEN_HEIGHT = 640;
@@ -78,15 +78,15 @@ void update(float deltaTime)
         player.x -= playerSpeed * deltaTime;
     }
 
-    else if (player.x < SCREEN_WIDTH - 74 && currentKeyStates[SDL_SCANCODE_D])
+    else if (player.x < SCREEN_WIDTH - player.w && currentKeyStates[SDL_SCANCODE_D])
     {
         player.x += playerSpeed * deltaTime;
     }
 
-    if (ball.y > SCREEN_HEIGHT + 32)
+    if (ball.y > SCREEN_HEIGHT + ball.h)
     {
-        ball.x = SCREEN_WIDTH / 2 - 32;
-        ball.y = SCREEN_HEIGHT / 2 - 32;
+        ball.x = SCREEN_WIDTH / 2 - ball.w;
+        ball.y = SCREEN_HEIGHT / 2 - ball.h;
 
         ballVelocityX *= -1;
     }
@@ -96,7 +96,7 @@ void update(float deltaTime)
         ballVelocityY *= -1;
     }
     
-    if (ball.x < 0 || ball.x > SCREEN_WIDTH - 32)
+    if (ball.x < 0 || ball.x > SCREEN_WIDTH - ball.w)
     {
         ballVelocityX *= -1;
     }
@@ -111,7 +111,6 @@ void update(float deltaTime)
         if (!bricks[i].isDestroyed && hasCollision(bricks[i].bounds, ball))
         {
             ballVelocityY *= -1;
-
             bricks[i].isDestroyed = true;
         }
     }
@@ -125,13 +124,15 @@ void render()
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
 
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDL_SetRenderDrawColor(renderer, 0, 255, 255, 255);
 
     for (Brick brick : bricks)
     {
         if (!brick.isDestroyed)
             SDL_RenderFillRect(renderer, &brick.bounds);
     }
+
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
     SDL_RenderFillRect(renderer, &player);
     SDL_RenderFillRect(renderer, &ball);
