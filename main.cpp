@@ -4,15 +4,16 @@
 
 SDL_Window *window = nullptr;
 SDL_Renderer *renderer = nullptr;
+
+const int SCREEN_WIDTH = 960;
+const int SCREEN_HEIGHT = 640;
+
 SDL_Rect player;
 SDL_Rect ball;
 
 int playerSpeed = 800;
 int ballVelocityX = 425;
 int ballVelocityY = 425;
-
-const int SCREEN_WIDTH = 960;
-const int SCREEN_HEIGHT = 640;
 
 typedef struct
 {
@@ -47,6 +48,13 @@ std::vector<Brick> createBricks()
     return bricks;
 }
 
+void quitGame() {
+
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
+}
+
 void handleEvents()
 {
     SDL_Event event;
@@ -55,9 +63,7 @@ void handleEvents()
     {
         if (event.type == SDL_QUIT || event.key.keysym.sym == SDLK_ESCAPE)
         {
-            SDL_DestroyRenderer(renderer);
-            SDL_DestroyWindow(window);
-            SDL_Quit();
+            quitGame();
             exit(0);
         }
     }
@@ -180,9 +186,7 @@ int main()
     while (true)
     {
         currentFrameTime = SDL_GetTicks();
-
-        deltaTime = (currentFrameTime - previousFrameTime) / 1000.0f; // Convert to seconds
-
+        deltaTime = (currentFrameTime - previousFrameTime) / 1000.0f;
         previousFrameTime = currentFrameTime;
 
         handleEvents();
@@ -190,9 +194,6 @@ int main()
         render();
     }
 
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
-
+    quitGame();
     return 0;
 }
