@@ -15,6 +15,8 @@ int playerSpeed = 800;
 int ballVelocityX = 425;
 int ballVelocityY = 425;
 
+bool isAutoPlayMode = false;
+
 typedef struct
 {
     SDL_Rect bounds;
@@ -78,6 +80,16 @@ bool hasCollision(SDL_Rect bounds, SDL_Rect ball)
 void update(float deltaTime)
 {
     const Uint8 *currentKeyStates = SDL_GetKeyboardState(NULL);
+
+    if (currentKeyStates[SDL_SCANCODE_W])
+    {
+        isAutoPlayMode = !isAutoPlayMode;
+    }
+
+    if (isAutoPlayMode)
+    {
+        player.x = ball.x;
+    }
 
     if (player.x > 0 && currentKeyStates[SDL_SCANCODE_A])
     {
