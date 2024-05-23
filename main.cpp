@@ -8,8 +8,8 @@ SDL_Renderer *renderer = nullptr;
 const int SCREEN_WIDTH = 960;
 const int SCREEN_HEIGHT = 640;
 
-SDL_Rect player;
-SDL_Rect ball;
+SDL_Rect player = {SCREEN_WIDTH / 2, SCREEN_HEIGHT - 32, 74, 16};
+SDL_Rect ball = {SCREEN_WIDTH / 2 - 20, SCREEN_HEIGHT / 2 - 20, 20, 20};
 
 int playerSpeed = 800;
 int ballVelocityX = 425;
@@ -22,8 +22,6 @@ typedef struct
     SDL_Rect bounds;
     bool isDestroyed;
 } Brick;
-
-std::vector<Brick> bricks;
 
 std::vector<Brick> createBricks()
 {
@@ -49,6 +47,8 @@ std::vector<Brick> createBricks()
 
     return bricks;
 }
+
+std::vector<Brick> bricks = createBricks();
 
 void quitGame() {
 
@@ -184,12 +184,6 @@ int main()
         SDL_Quit();
         return 1;
     }
-
-    bricks = createBricks();
-
-    player = {SCREEN_WIDTH / 2, SCREEN_HEIGHT - 32, 74, 16};
-
-    ball = {SCREEN_WIDTH / 2 - 20, SCREEN_HEIGHT / 2 - 20, 20, 20};
 
     Uint32 previousFrameTime = SDL_GetTicks();
     Uint32 currentFrameTime = previousFrameTime;
