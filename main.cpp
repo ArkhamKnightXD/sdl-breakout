@@ -6,7 +6,7 @@ SDL_Window *window = nullptr;
 SDL_Renderer *renderer = nullptr;
 
 const int SCREEN_WIDTH = 960;
-const int SCREEN_HEIGHT = 640;
+const int SCREEN_HEIGHT = 544;
 
 SDL_Rect player = {SCREEN_WIDTH / 2, SCREEN_HEIGHT - 32, 74, 16};
 SDL_Rect ball = {SCREEN_WIDTH / 2 - 20, SCREEN_HEIGHT / 2 - 20, 20, 20};
