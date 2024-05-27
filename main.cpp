@@ -30,11 +30,11 @@ std::vector<Brick> createBricks()
     int positionX;
     int positionY = 40;
 
-    for (int i = 0; i < 8; i++)
+    for (int row = 0; row < 8; row++)
     {
         positionX = 0;
 
-        for (int j = 0; j < 15; j++)
+        for (int column = 0; column < 15; column++)
         {
             Brick actualBrick = {{positionX, positionY, 60, 20}, false};
 
