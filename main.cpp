@@ -86,7 +86,7 @@ void update(float deltaTime)
         isAutoPlayMode = !isAutoPlayMode;
     }
 
-    if (isAutoPlayMode)
+    if (isAutoPlayMode && ball.x < SCREEN_WIDTH - player.w)
     {
         player.x = ball.x;
     }
