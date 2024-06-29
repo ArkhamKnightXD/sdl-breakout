@@ -10,44 +10,60 @@ const int SCREEN_HEIGHT = 544;
 SDL_Window *window = nullptr;
 SDL_Renderer *renderer = nullptr;
 
+TTF_Font *fontSquare = nullptr;
+
+SDL_Texture *scoreTexture = nullptr;
+SDL_Rect scoreBounds;
+
+SDL_Texture *liveTexture = nullptr;
+SDL_Rect liveBounds;
+
+SDL_Color fontColor = {255, 255, 255};
+
 Mix_Chunk *collisionSound = nullptr;
 Mix_Chunk *collisionWithPlayerSound = nullptr;
 
 SDL_Rect player = {SCREEN_WIDTH / 2, SCREEN_HEIGHT - 32, 74, 16};
+
+int playerScore;
+int playerLives = 2;
+
 SDL_Rect ball = {SCREEN_WIDTH / 2 - 20, SCREEN_HEIGHT / 2 - 20, 20, 20};
 
 int playerSpeed = 800;
 int ballVelocityX = 425;
 int ballVelocityY = 425;
-int playerScore = 0;
 
 bool isAutoPlayMode = false;
 
-typedef struct {
-    
+typedef struct
+{
     SDL_Rect bounds;
     bool isDestroyed;
+    int points;
 } Brick;
 
-std::vector<Brick> createBricks() {
-
+std::vector<Brick> createBricks()
+{
     std::vector<Brick> bricks;
 
+    int brickPoints = 8;
     int positionX;
     int positionY = 40;
 
-    for (int row = 0; row < 8; row++) {
-
+    for (int row = 0; row < 8; row++)
+    {
         positionX = 0;
 
-        for (int column = 0; column < 15; column++) {
-
-            Brick actualBrick = {{positionX, positionY, 60, 20}, false};
+        for (int column = 0; column < 15; column++)
+        {
+            Brick actualBrick = {{positionX, positionY, 60, 20}, false, brickPoints};
 
             bricks.push_back(actualBrick);
             positionX += 64;
         }
 
+        brickPoints--;
         positionY += 22;
     }
 
@@ -56,8 +72,8 @@ std::vector<Brick> createBricks() {
 
 std::vector<Brick> bricks = createBricks();
 
-void quitGame() {
-
+void quitGame()
+{
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
@@ -67,62 +83,141 @@ void handleEvents()
 {
     SDL_Event event;
 
-    while (SDL_PollEvent(&event)) {
-
-        if (event.type == SDL_QUIT || event.key.keysym.sym == SDLK_ESCAPE) {
-
+    while (SDL_PollEvent(&event))
+    {
+        if (event.type == SDL_QUIT || event.key.keysym.sym == SDLK_ESCAPE)
+        {
             quitGame();
             exit(0);
         }
     }
 }
 
+void updateScore(const char *text)
+{
+    if (fontSquare == nullptr)
+    {
+        printf("TTF_OpenFont fontSquare: %s\n", TTF_GetError());
+    }
+
+    SDL_Surface *surface1 = TTF_RenderUTF8_Blended(fontSquare, text, fontColor);
+    if (surface1 == nullptr)
+    {
+        printf("TTF_OpenFont: %s\n", TTF_GetError());
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Unable to load create title! SDL Error: %s\n", SDL_GetError());
+        exit(3);
+    }
+
+    SDL_DestroyTexture(scoreTexture);
+    scoreTexture = SDL_CreateTextureFromSurface(renderer, surface1);
+    if (scoreTexture == nullptr)
+    {
+        printf("TTF_OpenFont: %s\n", TTF_GetError());
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Unable to load texture for image block.bmp! SDL Error: %s\n", SDL_GetError());
+    }
+
+    SDL_FreeSurface(surface1);
+}
+
+void updateLives(const char *text)
+{
+    if (fontSquare == nullptr)
+    {
+        printf("TTF_OpenFont fontSquare: %s\n", TTF_GetError());
+    }
+
+    SDL_Surface *surface1 = TTF_RenderUTF8_Blended(fontSquare, text, fontColor);
+    if (surface1 == nullptr)
+    {
+        printf("TTF_OpenFont: %s\n", TTF_GetError());
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Unable to load create title! SDL Error: %s\n", SDL_GetError());
+        exit(3);
+    }
+
+    SDL_DestroyTexture(liveTexture);
+    liveTexture = SDL_CreateTextureFromSurface(renderer, surface1);
+    if (liveTexture == nullptr)
+    {
+        printf("TTF_OpenFont: %s\n", TTF_GetError());
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Unable to load texture for image block.bmp! SDL Error: %s\n", SDL_GetError());
+    }
+
+    SDL_FreeSurface(surface1);
+}
+
 void update(float deltaTime)
 {
     const Uint8 *currentKeyStates = SDL_GetKeyboardState(NULL);
 
-    if (currentKeyStates[SDL_SCANCODE_W]) {
+    if (currentKeyStates[SDL_SCANCODE_W])
+    {
         isAutoPlayMode = !isAutoPlayMode;
     }
 
-    if (isAutoPlayMode && ball.x < SCREEN_WIDTH - player.w) {
+    if (isAutoPlayMode && ball.x < SCREEN_WIDTH - player.w)
+    {
         player.x = ball.x;
     }
 
-    if (player.x > 0 && currentKeyStates[SDL_SCANCODE_A]) {
+    if (player.x > 0 && currentKeyStates[SDL_SCANCODE_A])
+    {
         player.x -= playerSpeed * deltaTime;
     }
 
-    else if (player.x < SCREEN_WIDTH - player.w && currentKeyStates[SDL_SCANCODE_D]) {
+    else if (player.x < SCREEN_WIDTH - player.w && currentKeyStates[SDL_SCANCODE_D])
+    {
         player.x += playerSpeed * deltaTime;
     }
 
-    if (ball.y > SCREEN_HEIGHT + ball.h) {
-
+    if (ball.y > SCREEN_HEIGHT + ball.h)
+    {
         ball.x = SCREEN_WIDTH / 2 - ball.w;
         ball.y = SCREEN_HEIGHT / 2 - ball.h;
 
         ballVelocityX *= -1;
-    }
-    
-    if (ball.x < 0 || ball.x > SCREEN_WIDTH - ball.w) {
 
+        if (playerLives > 0)
+        {
+            playerLives--;
+
+            std::string livesString = std::to_string(playerLives);
+
+            std::string completeString = "lives: " + livesString;
+
+            char const *livesChar = completeString.c_str();
+
+            updateLives(livesChar);
+        }
+    }
+
+    if (ball.x < 0 || ball.x > SCREEN_WIDTH - ball.w)
+    {
         ballVelocityX *= -1;
         Mix_PlayChannel(-1, collisionSound, 0);
     }
 
-    if (SDL_HasIntersection(&player, &ball) || ball.y < 0) {
-
+    if (SDL_HasIntersection(&player, &ball) || ball.y < 0)
+    {
         ballVelocityY *= -1;
         Mix_PlayChannel(-1, collisionWithPlayerSound, 0);
     }
 
-    for (Brick &brick : bricks) {
-
-        if (!brick.isDestroyed && SDL_HasIntersection(&brick.bounds, &ball)) {
-
+    for (Brick &brick : bricks)
+    {
+        if (!brick.isDestroyed && SDL_HasIntersection(&brick.bounds, &ball))
+        {
             ballVelocityY *= -1;
             brick.isDestroyed = true;
+
+            playerScore += brick.points;
+
+            std::string scoreString = std::to_string(playerScore);
+
+            std::string finalScoreString = "score: " + scoreString;
+
+            char const *score = finalScoreString.c_str();
+
+            updateScore(score);
 
             Mix_PlayChannel(-1, collisionSound, 0);
         }
@@ -137,11 +232,21 @@ void render()
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
 
+    SDL_QueryTexture(scoreTexture, NULL, NULL, &scoreBounds.w, &scoreBounds.h);
+    scoreBounds.x = 200;
+    scoreBounds.y = scoreBounds.h / 2 - 10;
+    SDL_RenderCopy(renderer, scoreTexture, NULL, &scoreBounds);
+
+    SDL_QueryTexture(liveTexture, NULL, NULL, &liveBounds.w, &liveBounds.h);
+    liveBounds.x = 600;
+    liveBounds.y = liveBounds.h / 2 - 10;
+    SDL_RenderCopy(renderer, liveTexture, NULL, &liveBounds);
+
     SDL_SetRenderDrawColor(renderer, 0, 255, 255, 255);
 
-    for (Brick brick : bricks) {
-
-        if (!brick.isDestroyed) 
+    for (Brick brick : bricks)
+    {
+        if (!brick.isDestroyed)
             SDL_RenderFillRect(renderer, &brick.bounds);
     }
 
@@ -152,7 +257,6 @@ void render()
 
     SDL_RenderPresent(renderer);
 }
-
 
 Mix_Chunk *loadSound(const char *p_filePath)
 {
@@ -196,7 +300,17 @@ int main(int argc, char *args[])
     {
         printf("SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError());
     }
-    
+
+    if (TTF_Init() == -1)
+    {
+        return 1;
+    }
+
+    fontSquare = TTF_OpenFont("res/fonts/square_sans_serif_7.ttf", 32);
+
+    updateScore("Score: 0");
+    updateLives("Lives: 2");
+
     collisionSound = loadSound("res/sounds/magic.wav");
     collisionWithPlayerSound = loadSound("res/sounds/drop.wav");
 
@@ -204,8 +318,8 @@ int main(int argc, char *args[])
     Uint32 currentFrameTime = previousFrameTime;
     float deltaTime = 0.0f;
 
-    while (true) {
-
+    while (true)
+    {
         currentFrameTime = SDL_GetTicks();
         deltaTime = (currentFrameTime - previousFrameTime) / 1000.0f;
         previousFrameTime = currentFrameTime;
