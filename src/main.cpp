@@ -173,14 +173,15 @@ void update(float deltaTime)
         Mix_PlayChannel(-1, collisionWithPlayerSound, 0);
     }
 
-    for (Brick &brick : bricks)
+
+    for (auto actualBrick = bricks.begin(); actualBrick != bricks.end();)
     {
-        if (!brick.isDestroyed && SDL_HasIntersection(&brick.bounds, &ball))
+        if (!actualBrick->isDestroyed && SDL_HasIntersection(&actualBrick->bounds, &ball))
         {
             ballVelocityY *= -1;
-            brick.isDestroyed = true;
+            actualBrick->isDestroyed = true;
 
-            playerScore += brick.points;
+            playerScore += actualBrick->points;
 
             std::string scoreString = std::to_string(playerScore);
 
@@ -194,17 +195,14 @@ void update(float deltaTime)
 
             break;
         }
-    }
 
-    for (auto iterator = bricks.begin(); iterator != bricks.end();)
-    {
-        if (iterator->isDestroyed)
+        if (actualBrick->isDestroyed)
         {
-            bricks.erase(iterator);
+            bricks.erase(actualBrick);
         }
         else
         {
-            iterator++;
+            actualBrick++;
         }
     }
 
