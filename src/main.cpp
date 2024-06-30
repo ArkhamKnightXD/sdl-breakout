@@ -151,11 +151,9 @@ void update(float deltaTime)
         {
             playerLives--;
 
-            std::string livesString = std::to_string(playerLives);
+            std::string livesString = "lives: " + std::to_string(playerLives);
 
-            std::string completeString = "lives: " + livesString;
-
-            char const *livesChar = completeString.c_str();
+            char const *livesChar = livesString.c_str();
 
             updateTextureText(liveTexture, livesChar);
         }
@@ -173,7 +171,6 @@ void update(float deltaTime)
         Mix_PlayChannel(-1, collisionWithPlayerSound, 0);
     }
 
-
     for (auto actualBrick = bricks.begin(); actualBrick != bricks.end();)
     {
         if (!actualBrick->isDestroyed && SDL_HasIntersection(&actualBrick->bounds, &ball))
@@ -183,11 +180,9 @@ void update(float deltaTime)
 
             playerScore += actualBrick->points;
 
-            std::string scoreString = std::to_string(playerScore);
+            std::string scoreString = "score: " + std::to_string(playerScore);
 
-            std::string finalScoreString = "score: " + scoreString;
-
-            char const *score = finalScoreString.c_str();
+            char const *score = scoreString.c_str();
 
             updateTextureText(scoreTexture, score);
 
