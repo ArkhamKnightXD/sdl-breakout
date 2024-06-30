@@ -178,7 +178,7 @@ void update(float deltaTime)
 
             playerScore += actualBrick->points;
 
-            std::string scoreString = "score: " + std::to_string(bricks.size());
+            std::string scoreString = "score: " + std::to_string(playerScore);
 
             updateTextureText(scoreTexture, scoreString.c_str());
 
