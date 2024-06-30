@@ -178,13 +178,11 @@ void update(float deltaTime)
 
             playerScore += actualBrick->points;
 
-            std::string scoreString = "score: " + std::to_string(playerScore);
+            std::string scoreString = "score: " + std::to_string(bricks.size());
 
             updateTextureText(scoreTexture, scoreString.c_str());
 
             Mix_PlayChannel(-1, collisionSound, 0);
-
-            break;
         }
 
         if (actualBrick->isDestroyed)
