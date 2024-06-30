@@ -153,9 +153,7 @@ void update(float deltaTime)
 
             std::string livesString = "lives: " + std::to_string(playerLives);
 
-            char const *livesChar = livesString.c_str();
-
-            updateTextureText(liveTexture, livesChar);
+            updateTextureText(liveTexture, livesString.c_str());
         }
     }
 
@@ -182,9 +180,7 @@ void update(float deltaTime)
 
             std::string scoreString = "score: " + std::to_string(playerScore);
 
-            char const *score = scoreString.c_str();
-
-            updateTextureText(scoreTexture, score);
+            updateTextureText(scoreTexture, scoreString.c_str());
 
             Mix_PlayChannel(-1, collisionSound, 0);
 
