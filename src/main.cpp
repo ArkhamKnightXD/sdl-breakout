@@ -47,6 +47,7 @@ std::vector<Brick> createBricks()
 {
     std::vector<Brick> bricks;
 
+    //8*15 Bricks
     bricks.reserve(120);
 
     int brickPoints = 8;
